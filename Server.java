@@ -4,14 +4,14 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class Server {
-    private static final int PORT = 12345;  // Her sunucu için farklı bir port belirleyin
+    private static final int PORT = 5001; // Her sunucu için port numaraları farklı olacak
     private static ConcurrentMap<String, List<String>> clientData = new ConcurrentHashMap<>();
+    private static final ReentrantLock lock = new ReentrantLock(); // ReentrantLock oluşturma
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Server is running on port " + PORT);
 
-            // İstemci bağlantılarını kabul eder ve her bağlantı için bir iş parçacığı oluşturur.
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 new ClientHandler(clientSocket).start();
@@ -52,8 +52,53 @@ public class Server {
         }
 
         private String processCommand(String command) {
-            // Gelen komutlara göre işlemleri gerçekleştirin (örneğin SUBSCRIBE, PUBLISH, LIST)
-            return "200 OK";  // Örnek yanıt
+            lock.lock(); // Kilidi al
+            try {
+                switch (command.split(" ")[0]) { // Komutu analiz et
+                    case "SUBSCRIBE":
+                        return handleSubscribe(command);
+                    case "UNSUBSCRIBE":
+                        return handleUnsubscribe(command);
+                    case "PUBLISH":
+                        return handlePublish(command);
+                    case "LIST":
+                        return handleList();
+                    case "STATUS":
+                        return handleStatus();
+                    default:
+                        return "Geçersiz komut";
+                }
+            } finally {
+                lock.unlock(); // Kilidi serbest bırak
+            }
+        }
+
+        private String handleSubscribe(String command) {
+            String clientId = command.split(" ")[1];
+            // Abone olma işlemleri
+            clientData.putIfAbsent(clientId, new ArrayList<>());
+            return "Abone olundu: " + clientId;
+        }
+
+        private String handleUnsubscribe(String command) {
+            String clientId = command.split(" ")[1];
+            // Aboneliği iptal etme işlemleri
+            clientData.remove(clientId);
+            return "Abonelik iptal edildi: " + clientId;
+        }
+
+        private String handlePublish(String command) {
+            String message = command.substring(command.indexOf(" ") + 1);
+            // Mesajı yayınlama işlemleri
+            return "Mesaj yayımlandı: " + message;
+        }
+
+        private String handleList() {
+            return "Aboneler: " + clientData.keySet();
+        }
+
+        private String handleStatus() {
+            return "Sunucu durumu: Çalışıyor";
         }
     }
 }
