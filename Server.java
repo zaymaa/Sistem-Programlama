@@ -1,12 +1,11 @@
 import java.io.*;
 import java.net.*;
-import java.util.*;
 import java.util.concurrent.*;
 
 public class Server {
-    private static final int PORT = 5001; // Her sunucu için port numaraları farklı olacak
+    private static final int PORT = 5001; // Sunucu portu
+    private static final ExecutorService threadPool = Executors.newCachedThreadPool(); // Thread havuzu
     private static ConcurrentMap<String, List<String>> clientData = new ConcurrentHashMap<>();
-    private static final ReentrantLock lock = new ReentrantLock(); // ReentrantLock oluşturma
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
@@ -14,14 +13,15 @@ public class Server {
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                new ClientHandler(clientSocket).start();
+                threadPool.execute(new ClientHandler(clientSocket)); // ClientHandler thread'ini başlat
             }
         } catch (IOException e) {
             System.out.println("Server error: " + e.getMessage());
         }
     }
 
-    private static class ClientHandler extends Thread {
+    // ClientHandler, istemci isteklerini işlemek için
+    private static class ClientHandler implements Runnable {
         private Socket socket;
         private PrintWriter out;
         private BufferedReader in;
@@ -30,6 +30,7 @@ public class Server {
             this.socket = socket;
         }
 
+        @Override
         public void run() {
             try {
                 out = new PrintWriter(socket.getOutputStream(), true);
@@ -51,45 +52,38 @@ public class Server {
             }
         }
 
+        // Gelen komutları işleme
         private String processCommand(String command) {
-            lock.lock(); // Kilidi al
-            try {
-                switch (command.split(" ")[0]) { // Komutu analiz et
-                    case "SUBSCRIBE":
-                        return handleSubscribe(command);
-                    case "UNSUBSCRIBE":
-                        return handleUnsubscribe(command);
-                    case "PUBLISH":
-                        return handlePublish(command);
-                    case "LIST":
-                        return handleList();
-                    case "STATUS":
-                        return handleStatus();
-                    default:
-                        return "Geçersiz komut";
-                }
-            } finally {
-                lock.unlock(); // Kilidi serbest bırak
+            switch (command.split(" ")[0]) {
+                case "SUBSCRIBE":
+                    return handleSubscribe(command);
+                case "UNSUBSCRIBE":
+                    return handleUnsubscribe(command);
+                case "PUBLISH":
+                    return handlePublish(command);
+                case "LIST":
+                    return handleList();
+                case "STATUS":
+                    return handleStatus();
+                default:
+                    return "Geçersiz komut";
             }
         }
 
         private String handleSubscribe(String command) {
             String clientId = command.split(" ")[1];
-            // Abone olma işlemleri
             clientData.putIfAbsent(clientId, new ArrayList<>());
             return "Abone olundu: " + clientId;
         }
 
         private String handleUnsubscribe(String command) {
             String clientId = command.split(" ")[1];
-            // Aboneliği iptal etme işlemleri
             clientData.remove(clientId);
             return "Abonelik iptal edildi: " + clientId;
         }
 
         private String handlePublish(String command) {
             String message = command.substring(command.indexOf(" ") + 1);
-            // Mesajı yayınlama işlemleri
             return "Mesaj yayımlandı: " + message;
         }
 
@@ -102,3 +96,4 @@ public class Server {
         }
     }
 }
+
