@@ -1,27 +1,24 @@
 import java.io.*;
 import java.net.*;
-import java.util.concurrent.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class Server {
-    private static final int PORT = 5001; // Sunucu portu
-    private static final ExecutorService threadPool = Executors.newCachedThreadPool(); // Thread havuzu
-    private static ConcurrentMap<String, List<String>> clientData = new ConcurrentHashMap<>();
+public class HASUPServer {
+    private static final int PORT = 65432;
+    private static Map<String, List<PrintWriter>> subscribers = new ConcurrentHashMap<>();
 
     public static void main(String[] args) {
+        System.out.println("HASUP Sunucusu başlatılıyor...");
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Server is running on port " + PORT);
-
             while (true) {
-                Socket clientSocket = serverSocket.accept();
-                threadPool.execute(new ClientHandler(clientSocket)); // ClientHandler thread'ini başlat
+                new ClientHandler(serverSocket.accept()).start();
             }
         } catch (IOException e) {
-            System.out.println("Server error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    // ClientHandler, istemci isteklerini işlemek için
-    private static class ClientHandler implements Runnable {
+    private static class ClientHandler extends Thread {
         private Socket socket;
         private PrintWriter out;
         private BufferedReader in;
@@ -30,70 +27,56 @@ public class Server {
             this.socket = socket;
         }
 
-        @Override
         public void run() {
+            System.out.println("Yeni istemci bağlı: " + socket);
             try {
-                out = new PrintWriter(socket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                out = new PrintWriter(socket.getOutputStream(), true);
 
-                String command;
-                while ((command = in.readLine()) != null) {
-                    String response = processCommand(command);
-                    out.println(response);
+                String message;
+                while ((message = in.readLine()) != null) {
+                    String[] command = message.split(" ", 2);
+                    switch (command[0]) {
+                        case "HELLO":
+                            out.println("ACK");
+                            break;
+                        case "SUBSCRIBE":
+                            subscribe(command[1]);
+                            break;
+                        case "PUBLISH":
+                            String[] publishData = command[1].split(" ", 2);
+                            publish(publishData[0], publishData[1]);
+                            break;
+                        case "GOODBYE":
+                            out.println("BYE");
+                            return;
+                    }
                 }
             } catch (IOException e) {
-                System.out.println("Error handling client: " + e.getMessage());
+                e.printStackTrace();
             } finally {
                 try {
                     socket.close();
                 } catch (IOException e) {
-                    System.out.println("Socket could not be closed: " + e.getMessage());
+                    e.printStackTrace();
+                }
+                System.out.println("İstemci bağlantısı kapandı: " + socket);
+            }
+        }
+
+        private void subscribe(String topic) {
+            subscribers.putIfAbsent(topic, Collections.synchronizedList(new ArrayList<>()));
+            subscribers.get(topic).add(out);
+            out.println("OK " + topic);
+        }
+
+        private void publish(String topic, String message) {
+            List<PrintWriter> subs = subscribers.get(topic);
+            if (subs != null) {
+                for (PrintWriter subscriber : subs) {
+                    subscriber.println("RECEIVED " + message);
                 }
             }
         }
-
-        // Gelen komutları işleme
-        private String processCommand(String command) {
-            switch (command.split(" ")[0]) {
-                case "SUBSCRIBE":
-                    return handleSubscribe(command);
-                case "UNSUBSCRIBE":
-                    return handleUnsubscribe(command);
-                case "PUBLISH":
-                    return handlePublish(command);
-                case "LIST":
-                    return handleList();
-                case "STATUS":
-                    return handleStatus();
-                default:
-                    return "Geçersiz komut";
-            }
-        }
-
-        private String handleSubscribe(String command) {
-            String clientId = command.split(" ")[1];
-            clientData.putIfAbsent(clientId, new ArrayList<>());
-            return "Abone olundu: " + clientId;
-        }
-
-        private String handleUnsubscribe(String command) {
-            String clientId = command.split(" ")[1];
-            clientData.remove(clientId);
-            return "Abonelik iptal edildi: " + clientId;
-        }
-
-        private String handlePublish(String command) {
-            String message = command.substring(command.indexOf(" ") + 1);
-            return "Mesaj yayımlandı: " + message;
-        }
-
-        private String handleList() {
-            return "Aboneler: " + clientData.keySet();
-        }
-
-        private String handleStatus() {
-            return "Sunucu durumu: Çalışıyor";
-        }
     }
 }
-
