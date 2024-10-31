@@ -33,6 +33,4 @@ public class Subscriber {
         return ID; // Abone ID'sini döndür
     }
 
-    // Getters and Setters
-    // (Getters and Setters for each field can be added here)
 }
