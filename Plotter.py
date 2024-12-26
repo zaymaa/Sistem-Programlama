@@ -1,6 +1,6 @@
 import socket  # Socket kütüphanesini içe aktar
 import json    # JSON kütüphanesini içe aktar
-import matplotlib.pyplot as plt  # Matplotlib kütüphanesini içe aktar
+import matplotlib.pyplot as plt  # type: ignore # Matplotlib kütüphanesini içe aktar
 
 # Sunucunun adresi ve portu
 HOST = 'localhost'  # Sunucu adresi
