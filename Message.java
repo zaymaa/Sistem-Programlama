@@ -1,3 +1,5 @@
+// Remove package declaration for testing
+
 import java.util.List;
 
 public class Message {
@@ -40,6 +42,30 @@ public class Message {
         return capacities; // Kapasite bilgilerini döndür
     }
 
+    public int getId() {
+        return subscriber.getId(); // Abone ID'sini döndür
+    }
+
+    public String getNameSurname() {
+        return subscriber.getNameSurname(); // Abonenin adı ve soyadını döndür
+    }
+
+    public long getStartDate() {
+        return subscriber.getStartDate(); // Abonelik başlangıç tarihini döndür
+    }
+
+    public long getLastAccessed() {
+        return subscriber.getLastAccessed(); // Son erişim tarihini döndür
+    }
+
+    public String[] getInterests() {
+        return subscriber.getInterests(); // İlgi alanlarını döndür
+    }
+
+    public boolean isOnline() {
+        return subscriber.isOnline(); // Çevrimiçi durumunu döndür
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -59,3 +85,4 @@ public class Message {
         return sb.toString(); // Mesajı döndür
     }
 }
+
