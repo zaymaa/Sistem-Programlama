@@ -1,1 +1,9 @@
+syntax = "proto3";
+
+package proje1;
+
+message Message {
+    string demand = 1; // Talep türü (SUBS, DEL, CPCTY, STRT, NOP)
+    string response = 2; // Yanıt durumu (YEP, NOP)
+}
 
