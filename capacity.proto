@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package proje1;
+
+message Capacity {
+    int32 server_id = 1; // Sunucu ID'si
+    int32 server_status = 2; // Abone sayısı
+    int64 timestamp = 3; // UNIX epoch time
+}
