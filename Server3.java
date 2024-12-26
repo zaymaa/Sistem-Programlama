@@ -64,5 +64,4 @@ public class Server3 {
             subscribers.removeIf(subscriber -> subscriber.getId() == message.getId());
         }
     }
-}
-``
+} // Closing brace for the Server3 class
