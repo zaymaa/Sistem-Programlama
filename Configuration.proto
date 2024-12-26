@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package proje1;
+
+message Configuration {
+    int32 fault_tolerance_level = 1; // Hata tolerans seviyesi
+    string method = 2; // Yöntem
+}
