@@ -1,3 +1,5 @@
+// Remove package declaration for testing
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -28,29 +30,33 @@ public class Server1 {
         }
 
         public void run() {
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+            try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+                 ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
 
-                String inputLine;
+                Object inputObject;
                 // Gelen mesajları dinle
-                while ((inputLine = in.readLine()) != null) {
-                    Message message = parseMessage(inputLine); // Mesajı ayrıştır
+                while ((inputObject = in.readObject()) != null) {
+                    Message message = (Message) inputObject; // Protobuf mesajını al
                     if (message.getDemand().equals("SUBS")) { // Eğer talep abone olma ise
                         handleSubscription(message); // Aboneliği işleme al
-                        out.println("{\"response\": \"YEP\"}"); // Yanıt olarak YEP gönder
+                        out.writeObject(new Message("YEP", null)); // Yanıt olarak YEP gönder
                     } else if (message.getDemand().equals("DEL")) { // Eğer talep abonelik iptali ise
                         handleUnsubscription(message); // Aboneliği iptal et
-                        out.println("{\"response\": \"YEP\"}"); // Yanıt olarak YEP gönder
+                        out.writeObject(new Message("YEP", null)); // Yanıt olarak YEP gönder
+                    } else if (message.getDemand().equals("CPCTY")) { // Eğer talep kapasite sorgulama ise
+                        handleCapacityQuery(message, out); // Kapasite sorgusunu işle
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace(); // Hata durumunda stack trace yazdır
             }
         }
 
-        private Message parseMessage(String inputLine) {
-            // Mesajı ayrıştırma (JSON formatında ayrıştırma yapmalısınız)
-            return new Message("SUBS", null); // Örnek döndürme, gerçek ayrıştırmayı yapmalısınız
+        private void handleCapacityQuery(Message message, ObjectOutputStream out) throws IOException {
+            // Kapasite sorgusunu işleyin
+            int serverStatus = subscribers.size(); // Abone sayısını al
+            Capacity capacityResponse = new Capacity(1, serverStatus, System.currentTimeMillis()); // Örnek sunucu ID'si
+            out.writeObject(capacityResponse); // Kapasite yanıtını gönder
         }
 
         private void handleSubscription(Message message) {
