@@ -1,4 +1,4 @@
-package proje1;
+// Remove package declaration for testing
 
 public class Configuration {
     private int faultToleranceLevel;
