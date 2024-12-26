@@ -1,1 +1,13 @@
+syntax = "proto3";
+
+package proje1;
+
+message Subscriber {
+    int32 id = 1; // Abone ID'si
+    string name_surname = 2; // Abonenin adı ve soyadı
+    int64 start_date = 3; // Abonelik başlangıç tarihi
+    int64 last_accessed = 4; // Son erişim tarihi
+    repeated string interests = 5; // Abonenin ilgi alanları
+    bool is_online = 6; // Abonenin çevrimiçi durumu
+}
 
