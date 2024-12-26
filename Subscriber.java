@@ -1,7 +1,6 @@
-package proje1;
+// Remove package declaration for testing
 
 public class Subscriber {
-    private String demand; // Talep türü (SUBS, DEL)
     private int ID; // Abone ID'si
     private String name_surname; // Abonenin adı ve soyadı
     private long start_date; // Abonelik başlangıç tarihi
@@ -33,4 +32,23 @@ public class Subscriber {
         return ID; // Abone ID'sini döndür
     }
 
+    public String getNameSurname() {
+        return name_surname; // Abonenin adı ve soyadını döndür
+    }
+
+    public long getStartDate() {
+        return start_date; // Abonelik başlangıç tarihini döndür
+    }
+
+    public long getLastAccessed() {
+        return last_accessed; // Son erişim tarihini döndür
+    }
+
+    public String[] getInterests() {
+        return interests; // İlgi alanlarını döndür
+    }
+
+    public boolean isOnline() {
+        return isOnline; // Çevrimiçi durumunu döndür
+    }
 }
