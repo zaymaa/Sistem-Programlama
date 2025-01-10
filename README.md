@@ -1,37 +1,15 @@
 ServerX.java özellikleri
 
-    admin_client.rb ile başlama
-    hata toleransı 1 prensibiyle çalışma
-    hata toleransı 1 prensibiyle çalışma
-    ...
-    ...
-    Uranus
-    Neptune
-    Comet Haley
+   ✅ hata toleransı 1 prensibiyle çalışma
+   
 
 plotter.py özellikleri
 
-    Mercury
-    Venus
-    Earth (Orbit/Moon)
-    Mars
-    Jupiter
-    Saturn
-    Uranus
-    Neptune
-    Comet Haley
+   ❌ no
 
 admin.rb özellikleri
 
-    Mercury
-    Venus
-    Earth (Orbit/Moon)
-    Mars
-    Jupiter
-    Saturn
-    Uranus
-    Neptune
-    Comet Haley
+   ❌ no
 
 Ekip üyeleri# Sistem-Programlama
 
