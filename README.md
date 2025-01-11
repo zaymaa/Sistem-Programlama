@@ -6,11 +6,11 @@ ServerX.java özellikleri
 
 plotter.py özellikleri
 
-   ❌ no
+   ❌ Çalışmıyor 
 
 admin.rb özellikleri
 
-   ❌ no
+   ❌ Çalışmıyor 
 
 Ekip üyeleri# Sistem-Programlama
 
