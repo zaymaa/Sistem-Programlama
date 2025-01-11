@@ -1,6 +1,6 @@
 ServerX.java özellikleri
 
-   ✅ hata toleransı 1 prensibiyle çalışma
+   ✅ hata toleransı 1 ve 2 prensibiyle çalışma
    
 
 plotter.py özellikleri
