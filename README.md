@@ -14,6 +14,6 @@ admin.rb özellikleri
 
 Ekip üyeleri# Sistem-Programlama
 
-21060-Zayma Rümeysa KARKİ
+21060124-Zayma Rümeysa KARKİ
 19060397-Mustafa KILIÇ
 20061163-Moustapha Naouchi
