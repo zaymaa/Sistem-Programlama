@@ -1,0 +1,136 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+package proje1;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.Random;
+import java.util.Scanner;
+
+public class Client {
+   private static final int MAX_SERVERS = 3;
+   private static final int MIN_CLIENT_ID = 1;
+   private static final int MAX_CLIENT_ID = 100;
+
+   public Client() {
+   }
+
+   public static void main(String[] var0) {
+      Scanner var1 = new Scanner(System.in);
+      int var2 = getInputNumber(var1, "Enter client ID (between 1 and 100): ", 1, 100);
+      Random var3 = new Random();
+      int var4 = var3.nextInt(3) + 1;
+      System.out.println("Selected server: Server" + var4);
+
+      int var5;
+      do {
+         System.out.println("SERILESTIRILMISNESNE_otomatiktir");
+         System.out.println("1-5 aras\u0131 se\u00e7im yap:");
+         System.out.println("1. ABONOL");
+         System.out.println("2. ABONIPTAL");
+         System.out.println("3. GIRIS");
+         System.out.println("4. CIKIS");
+         System.out.println("5. Exit");
+         System.out.print("Choice: ");
+         var5 = var1.nextInt();
+         var1.nextLine();
+         switch (var5) {
+            case 1:
+               sendAndReceiveMessage("localhost", 5000 + var4, var2, "ABONOL");
+               break;
+            case 2:
+               sendAndReceiveMessage("localhost", 5000 + var4, var2, "ABONIPTAL");
+               break;
+            case 3:
+               sendAndReceiveMessage("localhost", 5000 + var4, var2, "GIRIS");
+               break;
+            case 4:
+               sendAndReceiveMessage("localhost", 5000 + var4, var2, "CIKIS");
+               break;
+            case 5:
+               System.out.println("Exiting...");
+               break;
+            default:
+               System.out.println("Invalid choice. Please enter a number between 1 to 5.");
+         }
+      } while(var5 != 5);
+
+      var1.close();
+   }
+
+   private static void sendAndReceiveMessage(String var0, int var1, int var2, String var3) {
+      try {
+         Socket var4 = new Socket(var0, var1);
+
+         try {
+            PrintWriter var5 = new PrintWriter(var4.getOutputStream(), true);
+
+            try {
+               BufferedReader var6 = new BufferedReader(new InputStreamReader(var4.getInputStream()));
+
+               try {
+                  var5.println(var3 + " " + var2);
+                  String var7 = var6.readLine();
+                  String var8 = var6.readLine();
+                  System.out.println("Response from server on port " + var1 + ": " + var7);
+                  System.out.println("Response from server on port " + var1 + ": " + var8);
+                  var4.close();
+               } catch (Throwable var12) {
+                  try {
+                     var6.close();
+                  } catch (Throwable var11) {
+                     var12.addSuppressed(var11);
+                  }
+
+                  throw var12;
+               }
+
+               var6.close();
+            } catch (Throwable var13) {
+               try {
+                  var5.close();
+               } catch (Throwable var10) {
+                  var13.addSuppressed(var10);
+               }
+
+               throw var13;
+            }
+
+            var5.close();
+         } catch (Throwable var14) {
+            try {
+               var4.close();
+            } catch (Throwable var9) {
+               var14.addSuppressed(var9);
+            }
+
+            throw var14;
+         }
+
+         var4.close();
+      } catch (IOException var15) {
+         System.out.println("Error connecting to server on port " + var1 + ": " + var15.getMessage());
+      }
+
+   }
+
+   private static int getInputNumber(Scanner var0, String var1, int var2, int var3) {
+      int var4;
+      do {
+         System.out.print(var1);
+
+         while(!var0.hasNextInt()) {
+            System.out.println("Please enter a valid number.");
+            System.out.print(var1);
+            var0.next();
+         }
+
+         var4 = var0.nextInt();
+         var0.nextLine();
+      } while(var4 < var2 || var4 > var3);
+
+      return var4;
+   }
+}
