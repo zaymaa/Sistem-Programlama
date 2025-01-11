@@ -17,3 +17,5 @@ Ekip üyeleri# Sistem-Programlama
 21060124-Zayma Rümeysa KARKİ
 19060397-Mustafa KILIÇ
 20061163-Moustapha Naouchi
+
+VIDEO : https://youtu.be/-I7i3GTGU1Y 
